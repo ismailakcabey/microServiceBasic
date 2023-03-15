@@ -12,11 +12,6 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('user')
-  userServicePing(){
-    return this.appService.pingUserService();
-  }
-
   @Get('todo')
   toDoServicePing(){
     return this.appService.pingToDoService();

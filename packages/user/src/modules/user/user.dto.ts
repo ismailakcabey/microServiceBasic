@@ -2,11 +2,15 @@ import {
     IsString,
     IsDate,
     IsNumber,
-    IsBoolean
+    IsBoolean,
+    IsObject
 } from 'class-validator'
 import { IsObjectId } from 'class-validator-mongo-object-id'
 
 export class UserDto{
+
+    @IsString()
+    id?:string
  
     @IsString()
     fullName?:string
@@ -20,4 +24,36 @@ export class UserDto{
     @IsDate()
     birthDate?:Date
 
+}
+
+export class UserExcelDto{
+
+    @IsString()
+    id?:string
+ 
+    @IsObject()
+    user:UserDto
+
+}
+
+
+export class UserUpdateDto{
+
+    @IsString()
+    id?:string
+ 
+    
+    @IsObject()
+    data?:UserDto
+
+}
+
+export class UserLoginDto{
+
+    @IsString()
+    email?:string
+
+    @IsString()
+    password?:string
+    
 }

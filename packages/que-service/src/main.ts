@@ -7,14 +7,19 @@ const logger = new Logger
 
 async function bootstrap(){
   const app = await NestFactory.createMicroservice(AppModule,{
-    transport: Transport.TCP,
+    transport: Transport.RMQ,
     options: {
-      host: '127.0.0.1',
-      port:3001
+      urls: ['amqp://guest:guest@localhost:5672'],
+      queue: 'messages_que',
+      queueOptions: {
+        durable: false
+      },
+      reconnectTime: 5000
     },
+    
   })
   await app.listen().then(()=>{
-    logger.log('MicroService User Listening')
+    logger.log('MicroService Que Listening')
   }).catch((err) => {
     logger.error(err)
   })

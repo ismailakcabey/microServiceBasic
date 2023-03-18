@@ -5,6 +5,7 @@ import { Client } from '@nestjs/microservices/external/nats-client.interface';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
     imports:[

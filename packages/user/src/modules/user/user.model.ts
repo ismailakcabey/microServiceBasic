@@ -26,3 +26,10 @@ export interface User extends mongoose.Document{
     email:string,
     birthDate:Date
 }
+
+export interface UserExcel extends mongoose.Document{
+    fullName:string,
+    password:string,
+    email:string,
+    birthDate:Date
+}

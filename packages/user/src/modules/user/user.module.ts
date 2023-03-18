@@ -5,6 +5,8 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { UserSchema } from './user.model';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv'
+import { JwtModule } from '@nestjs/jwt';
+import {AmqpModule} from 'nestjs-amqp';
 dotenv.config({debug:true})
 @Module({
   imports: [
@@ -15,6 +17,13 @@ dotenv.config({debug:true})
          uri: config.get<string>('MONGO_DB_TODO_USER_URL'),
         }),
         inject: [ConfigService],
+      }),
+      JwtModule.register({
+        secret: 'secret',
+        signOptions: {expiresIn: '1d'}
+    }),
+    ConfigModule.forRoot({
+        isGlobal: true,
       }),
   ],
   controllers: [UserController],

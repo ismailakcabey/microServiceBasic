@@ -21,3 +21,14 @@ export class UserDto{
     birthDate?:Date
 
 }
+
+export class UserLoginDto{
+
+    @IsString()
+    email?:string
+
+    @IsString()
+    password?:string
+
+}
+

@@ -8,6 +8,7 @@ const passwordHash = require('password-hash');
 import * as dotenv from 'dotenv'
 import { Cache } from 'cache-manager';
 import * as AWS from 'aws-sdk';
+import { ClientProxy } from '@nestjs/microservices';
 var fs = require('fs');
 const XLSX = require('xlsx');
 dotenv.config()
@@ -35,10 +36,9 @@ export class UserService {
         }
         addUser.password = passwordHash.generate(addUser?.password)
     const result = await addUser.save()
-    let email = await this.sendUserVerifyMail(addUser)
     return {
         status:true,
-        data:result?.id as string,
+        data:result,
     }
     } catch (error) {
         return {
@@ -48,41 +48,41 @@ export class UserService {
     }
   }
 
-  async sendUserVerifyMail(user:User){
-    dotenv.config({debug: true});
-    const Mailjet = require('node-mailjet');
-const mailjet = new Mailjet({
-apiKey: process.env.MAIL_JET_API_KEY,
-apiSecret: process.env.MAIL_JET_API_SECRET_KEY
-});
-const request = mailjet
-    .post('send', { version: 'v3.1' })
-    .request({
-      Messages: [
-        {
-          From: {
-            Email: process.env.MAIL_JET_SEND_EMAIL,
-            Name: "ToDo App"
-          },
-          To: [
-            {
-              Email: user.email,
-              Name: user.fullName
-            }
-          ],
-          Subject: "Email Doğrulama",
-          TextPart: "Mailde doğrulama maili",
-        }
-      ]
-    })
-request
-.then((result) => {
-})
-.catch((err) => {
-    console.log(err.statusCode)
+//   async sendUserVerifyMail(user:User){
+//     dotenv.config({debug: true});
+//     const Mailjet = require('node-mailjet');
+// const mailjet = new Mailjet({
+// apiKey: process.env.MAIL_JET_API_KEY,
+// apiSecret: process.env.MAIL_JET_API_SECRET_KEY
+// });
+// const request = mailjet
+//     .post('send', { version: 'v3.1' })
+//     .request({
+//       Messages: [
+//         {
+//           From: {
+//             Email: process.env.MAIL_JET_SEND_EMAIL,
+//             Name: "ToDo App"
+//           },
+//           To: [
+//             {
+//               Email: user.email,
+//               Name: user.fullName
+//             }
+//           ],
+//           Subject: "Email Doğrulama",
+//           TextPart: "Mailde doğrulama maili",
+//         }
+//       ]
+//     })
+// request
+// .then((result) => {
+// })
+// .catch((err) => {
+//     console.log(err.statusCode)
 
-})
-}
+// })
+// }
 
   async listUser(request: UserDto){
     try {

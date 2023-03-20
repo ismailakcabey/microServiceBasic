@@ -1,7 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
-import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
+import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
+import { async } from 'rxjs';
 import { AppService } from './app.service';
-
+import * as dotenv from 'dotenv'
+const Mailjet = require('node-mailjet');
+import { User } from './user.model';
+dotenv.config()
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -40,6 +44,53 @@ async delay(ms: number) {
     return { result };
   }
 
+  @MessagePattern({cmd:'message_printed'})
+  async handleMessagePrinted(request:any) {
+    console.log("que'de")
+    await this.delay(5000);
+    console.log(request)
+  }
+
+  @MessagePattern( {cmd:'user_verify_mail'})
+  async verifyMail(user:User){
+    dotenv.config({debug: true});
+    const Mailjet = require('node-mailjet');
+const mailjet = new Mailjet({
+apiKey: process.env.MAIL_JET_API_KEY,
+apiSecret: process.env.MAIL_JET_API_SECRET_KEY
+});
+console.log("servis içi bekliyor servise gel")
+await this.delay(30000);
+console.log("servis bitti 30sn")
+const request = mailjet
+    .post('send', { version: 'v3.1' })
+    .request({
+      Messages: [
+        {
+          From: {
+            Email: process.env.MAIL_JET_SEND_EMAIL,
+            Name: "ToDo App"
+          },
+          To: [
+            {
+              Email: user.email,
+              Name: user.fullName
+            }
+          ],
+          Subject: "Email Doğrulama",
+          TextPart: "Mailde doğrulama maili",
+        }
+      ]
+    })
+request
+.then((result) => {
+})
+.catch((err) => {
+    console.log(err.statusCode)
+
+})
+return "success"
+  }
 
 
 }

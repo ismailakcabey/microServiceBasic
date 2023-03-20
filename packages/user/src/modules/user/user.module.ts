@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv'
 import { JwtModule } from '@nestjs/jwt';
 import {AmqpModule} from 'nestjs-amqp';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 dotenv.config({debug:true})
 @Module({
   imports: [

@@ -13,6 +13,7 @@ import * as flatted from 'flatted';
 export class UserService{
     constructor(
         @Inject('USER_SERVICE') private readonly clientServiceUser:ClientProxy,
+        @Inject('QUE_SERVICE') private readonly clientServiceQue:ClientProxy,
         private jwtService: JwtService,
     ){}
     async addUser(user:UserDto){
@@ -20,6 +21,10 @@ export class UserService{
             const pattern = { cmd : 'create_user'}
             const payload = user
             const response = await this.clientServiceUser.send(pattern,payload).toPromise()
+            const patternVerifyMail = { cmd : 'user_verify_mail'}
+            const payloadUser = response.data
+            const connect = this.clientServiceQue.connect()
+            const email = await this.clientServiceQue.emit(patternVerifyMail,payloadUser).toPromise()
             return response
         } catch (error) {
             return {

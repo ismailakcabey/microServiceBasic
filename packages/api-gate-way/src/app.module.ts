@@ -21,17 +21,6 @@ import { UserModule } from './modules/user/user.module';
           port:3002
         }
       },
-      {
-        name: 'QUE_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://guest:guest@localhost:5672'],
-          queue: 'messages_que',
-          queueOptions: {
-            durable: false
-          },
-        },
-      },
     ])
   ],
   controllers: [AppController],

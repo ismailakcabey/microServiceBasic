@@ -30,6 +30,7 @@ export class UserController{
         return await this.userService.listUser(user)
     }
 
+
     @Get('/excel')
     async getUserExcel(
         @Query() user: UserDto,

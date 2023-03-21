@@ -26,19 +26,6 @@ import { MongooseModule } from '@nestjs/mongoose';
         ConfigModule.forRoot({
             isGlobal: true,
           }),
-          ClientsModule.register([
-            {
-              name: 'QUE_SERVICE',
-              transport: Transport.RMQ,
-              options: {
-                urls: ['amqp://guest:guest@127.0.0.1:5672'],
-                queue: 'rabbit-que',
-                queueOptions: {
-                  durable: false
-                },
-              },
-            },
-          ])
     ],
     controllers:[
         UserController

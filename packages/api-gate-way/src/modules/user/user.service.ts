@@ -6,14 +6,13 @@ import { Model } from "mongoose";
 import { resolve } from "path";
 import { UserDto, UserLoginDto } from "./user.dto";
 import {Response, Request, response} from 'express';
-import { map, Observable } from 'rxjs';
+import { async, map, Observable } from 'rxjs';
 import * as flatted from 'flatted';
-
+const amqp = require("amqplib")
 @Injectable()
 export class UserService{
     constructor(
         @Inject('USER_SERVICE') private readonly clientServiceUser:ClientProxy,
-        @Inject('QUE_SERVICE') private readonly clientServiceQue:ClientProxy,
         private jwtService: JwtService,
     ){}
     async addUser(user:UserDto){
@@ -21,10 +20,7 @@ export class UserService{
             const pattern = { cmd : 'create_user'}
             const payload = user
             const response = await this.clientServiceUser.send(pattern,payload).toPromise()
-            const patternVerifyMail = { cmd : 'user_verify_mail'}
             const payloadUser = response.data
-            const connect = this.clientServiceQue.connect()
-            const email = await this.clientServiceQue.emit(patternVerifyMail,payloadUser).toPromise()
             return response
         } catch (error) {
             return {

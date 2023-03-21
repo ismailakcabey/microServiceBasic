@@ -8,6 +8,8 @@ import * as dotenv from 'dotenv'
 import { JwtModule } from '@nestjs/jwt';
 import {AmqpModule} from 'nestjs-amqp';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { UserRabbitCron } from './user.rabbitConsumer.cron';
+import { ScheduleModule } from '@nestjs/schedule';
 dotenv.config({debug:true})
 @Module({
   imports: [
@@ -26,8 +28,10 @@ dotenv.config({debug:true})
     ConfigModule.forRoot({
         isGlobal: true,
       }),
+      ScheduleModule.forRoot()
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService,
+  UserRabbitCron],
 })
 export class UserModule {}

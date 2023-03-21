@@ -9,6 +9,7 @@ import * as dotenv from 'dotenv'
 import { Cache } from 'cache-manager';
 import * as AWS from 'aws-sdk';
 import { ClientProxy } from '@nestjs/microservices';
+const amqp = require("amqplib")
 var fs = require('fs');
 const XLSX = require('xlsx');
 dotenv.config()
@@ -36,6 +37,7 @@ export class UserService {
         }
         addUser.password = passwordHash.generate(addUser?.password)
     const result = await addUser.save()
+    this.rabbitMqQueueMailConnect(addUser)
     return {
         status:true,
         data:result,
@@ -48,41 +50,52 @@ export class UserService {
     }
   }
 
-//   async sendUserVerifyMail(user:User){
-//     dotenv.config({debug: true});
-//     const Mailjet = require('node-mailjet');
-// const mailjet = new Mailjet({
-// apiKey: process.env.MAIL_JET_API_KEY,
-// apiSecret: process.env.MAIL_JET_API_SECRET_KEY
-// });
-// const request = mailjet
-//     .post('send', { version: 'v3.1' })
-//     .request({
-//       Messages: [
-//         {
-//           From: {
-//             Email: process.env.MAIL_JET_SEND_EMAIL,
-//             Name: "ToDo App"
-//           },
-//           To: [
-//             {
-//               Email: user.email,
-//               Name: user.fullName
-//             }
-//           ],
-//           Subject: "Email Doğrulama",
-//           TextPart: "Mailde doğrulama maili",
-//         }
-//       ]
-//     })
-// request
-// .then((result) => {
-// })
-// .catch((err) => {
-//     console.log(err.statusCode)
 
-// })
-// }
+async rabbitMqQueueMailConnect(user:UserDto){
+  try {
+  const connection = await amqp.connect("amqp://guest:guest@localhost:5672")
+  const channel = await connection.createChannel()
+  const assertion = await channel.assertQueue("jobsQue")
+      channel.sendToQueue("jobsQue",Buffer.from(JSON.stringify(user)))
+  } catch (error) {
+      console.log(error)
+  }
+}
+
+   async sendUserVerifyMail(user:User){
+     dotenv.config({debug: true});
+     const Mailjet = require('node-mailjet');
+ const mailjet = new Mailjet({
+ apiKey: process.env.MAIL_JET_API_KEY,
+ apiSecret: process.env.MAIL_JET_API_SECRET_KEY
+ });
+ const request = mailjet
+     .post('send', { version: 'v3.1' })
+     .request({
+       Messages: [
+         {
+           From: {
+             Email: process.env.MAIL_JET_SEND_EMAIL,
+             Name: "ToDo App"
+           },
+           To: [
+             {
+               Email: user.email,
+               Name: user.fullName
+             }
+           ],
+           Subject: "Email Doğrulama",
+           TextPart: "Mailde doğrulama maili",
+         }
+       ]
+     })
+ request
+ .then((result) => {
+ })
+ .catch((err) => {
+     console.log(err.statusCode)
+ })
+ }
 
   async listUser(request: UserDto){
     try {

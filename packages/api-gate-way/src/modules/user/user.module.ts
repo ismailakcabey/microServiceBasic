@@ -32,6 +32,9 @@ import { MongooseModule } from '@nestjs/mongoose';
     ],
     providers:[
         UserService
+    ],
+    exports:[
+        UserService
     ]
 })
 

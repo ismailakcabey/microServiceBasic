@@ -7,7 +7,6 @@ import { UserDto } from './modules/user/user.dto';
 @Injectable()
 export class AppService {
   constructor(
-    @Inject('TODO_SERVICE') private readonly clientServiceToDo: ClientProxy,
   ){}
 
   getHello(): string {
@@ -17,7 +16,6 @@ export class AppService {
   pingToDoService(){
     const pattern = { cmd: 'ping'}
     const payload = {}
-    return this.clientServiceToDo.send(pattern,payload)
   }
 
   pingQueService(){

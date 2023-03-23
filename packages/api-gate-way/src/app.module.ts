@@ -4,24 +4,16 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ToDoModule } from './modules/todo/todo.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
     UserModule,
+    ToDoModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ClientsModule.register([
-      {
-        name:'TODO_SERVICE',
-        transport: Transport.TCP,
-        options:{
-          host:'127.0.0.1',
-          port:3002
-        }
-      },
-    ])
   ],
   controllers: [AppController],
   providers: [AppService],

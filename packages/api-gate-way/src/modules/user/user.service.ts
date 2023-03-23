@@ -20,7 +20,6 @@ export class UserService{
             const pattern = { cmd : 'create_user'}
             const payload = user
             const response = await this.clientServiceUser.send(pattern,payload).toPromise()
-            const payloadUser = response.data
             return response
         } catch (error) {
             return {

@@ -57,3 +57,19 @@ export class UserLoginDto{
     password?:string
     
 }
+
+
+export class IResponse{
+    
+    @IsBoolean()
+    status?:boolean
+
+    @IsObject()
+    data?:object
+
+    @IsNumber()
+    count?:number
+
+    @IsString()
+    message?:string
+}

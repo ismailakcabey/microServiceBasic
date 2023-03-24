@@ -40,14 +40,14 @@ export class TodoController{
 
     @Get()
     async listTodo(
-        @Req() req: Request
+        @Req() req: Request,
+        @Query() todo: ToDoDto
     ){
-
-    }
-
-    @Get('/excel')
-    async getTodoExcel(){
-
+        const auth = await this.userService.authControl(req);
+        if(!(auth.status)){
+            throw new UnauthorizedException();
+        }
+        return await this.todoService.listTodo(todo)
     }
 
     @Get(':id')
@@ -55,20 +55,37 @@ export class TodoController{
         @Param('id') id: string,
         @Req() req: Request
     ){
+        const auth = await this.userService.authControl(req);
+        if(!(auth.status)){
+            throw new UnauthorizedException();
+        }
+        return await this.todoService.getTodoById(id);
 
     }
 
     @Patch(':id')
     async updateTodoById(
-        @Req() req: Request
+        @Req() req: Request,
+        @Body() todo:ToDoDto,
+        @Param('id') id:string
     ){
-
+        const auth = await this.userService.authControl(req);
+        if(!(auth.status)){
+            throw new UnauthorizedException();
+        }
+        todo.updatedAt = new Date
+        return await this.todoService.updateTodoById(id, todo)
     }
 
     @Delete(':id')
     async deleteTodoById(
-        @Req() req: Request
+        @Req() req: Request,
+        @Param('id') id:string
     ){
-
+        const auth = await this.userService.authControl(req);
+        if(!(auth.status)){
+            throw new UnauthorizedException();
+        }
+        return await this.todoService.deleteTodoById(id)
     }
 }

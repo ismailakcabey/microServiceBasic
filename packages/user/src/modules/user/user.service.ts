@@ -2,13 +2,14 @@ import { CACHE_MANAGER, Inject, Injectable, UnauthorizedException } from '@nestj
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserDto, UserExcelDto, UserLoginDto, UserUpdateDto } from './user.dto';
+import { IResponse, UserDto, UserExcelDto, UserLoginDto, UserUpdateDto } from './user.dto';
 import { User, UserExcel } from './user.model';
 const passwordHash = require('password-hash');
 import * as dotenv from 'dotenv'
 import { Cache } from 'cache-manager';
 import * as AWS from 'aws-sdk';
 import { ClientProxy } from '@nestjs/microservices';
+import { UserError } from './user.error.enum';
 const amqp = require("amqplib")
 var fs = require('fs');
 const XLSX = require('xlsx');
@@ -25,15 +26,12 @@ export class UserService {
     return 'Hello World!';
   }
 
-  async addUser(request:UserDto){
+  async addUser(request:UserDto):Promise<IResponse>{
     try {
         const addUser = new this.user(request)
         const conrtolEmail = await this.user.findOne({ email: request.email})
         if(conrtolEmail){
-          return{
-            status:false,
-            message:'email already'
-          }
+          throw new Error(UserError.EMAIL_ALREADY)
         }
         addUser.password = passwordHash.generate(addUser?.password)
     const result = await addUser.save()
@@ -97,7 +95,7 @@ async rabbitMqQueueMailConnect(user:UserDto){
  })
  }
 
-  async listUser(request: UserDto){
+  async listUser(request: UserDto):Promise<IResponse>{
     try {
         const users = await this.user.find(request)
         const count = await this.user.count(request)
@@ -114,7 +112,7 @@ async rabbitMqQueueMailConnect(user:UserDto){
     }
   }
 
-  async getUserById(request:string){
+  async getUserById(request:string):Promise<IResponse>{
     try {
       const user = await this.user.findById(request)
       if(!user){
@@ -135,7 +133,7 @@ async rabbitMqQueueMailConnect(user:UserDto){
     }
   }
 
-  async updateUserById(request:UserUpdateDto){
+  async updateUserById(request:UserUpdateDto):Promise<IResponse>{
     try {
       const user = await this.user.findByIdAndUpdate(request.id,request.data)
       return{
@@ -150,7 +148,7 @@ async rabbitMqQueueMailConnect(user:UserDto){
     }
   }
 
-  async deleteUserById(request:string){
+  async deleteUserById(request:string):Promise<IResponse>{
     try {
       const user = await this.user.findByIdAndDelete(request)
       return {
@@ -217,7 +215,7 @@ async rabbitMqQueueMailConnect(user:UserDto){
    }
 }
 
-  async getUserExcel(filter: UserExcelDto){
+  async getUserExcel(filter: UserExcelDto):Promise<IResponse>{
     const user = await this.user.findById(filter.id)
     const controlExcel = await this.cacheManager.get(`userExcel${user.id}`)
     if(controlExcel){
